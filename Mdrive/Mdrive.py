@@ -20,12 +20,9 @@ def connections():
         s = socket.socket(socket.AF_INET)
         s.settimeout(1)
         s.connect(('192.168.0.7', 5000))
-
         s.setblocking(True)
-        prnt("Подключились к сокету")
     except:
         prnt("Ошибка, проверьте правильность данных.")
-
 ui.pushButton.clicked.connect( connections )
 
 # Функция для занесения данных в textEdit
@@ -35,100 +32,63 @@ def prnt(s):
 # Отправление запроса двигателю.
 def send():
     try:
-        text = ui.lineEdit.text()
-        name = ui.lineEdit_5.text()
-        s.send("\n".encode("utf-8") + name.encode("utf-8") + text.encode("utf-8") + "\n".encode("utf-8"))
-        this.socket.setSoTimeout(timeOut)
-        time.sleep(0.5)
-        data = s.recv(1024)
-        prnt ( "\n" + str(data.decode()) + "\n")
         prnt("Запрос отправлен \n")
+        prnt(drive(ui.lineEdit_5.text(), ui.lineEdit.text()))
     except:
         prnt("\nПроверьте правильность команды. \n")
-
 ui.pushButton_2.clicked.connect( send )
+
+
+# Запрос двигателю
+def drive(name, cmd, speed = '', timeout = 0.03):
+        try:
+            s.send("\n".encode("utf-8") + name.encode("utf-8") + cmd.encode("utf-8") + speed.encode("utf-8") + "\n".encode("utf-8"))
+            this.socket.setSoTimeout(timeOut)
+            time.sleep(timeout)
+            otvet = s.recv(1024)
+            return otvet
+        except:
+            return "\nУстройство не подключено\n"
+
 
 #Движение по оси -x
 def left():
-    try:
-        global Speed
-        Speed = ui.lineEdit_4.text()
-        s.send("\n".encode("utf-8") + "X SL -".encode("utf-8") + Speed.encode("utf-8") + "\n".encode("utf-8"))
-        otvet = s.recv(1024)
-        prnt ( "\n" + str(otvet) + "\n")
-        prnt("\nДвижение началось\n")
-    except:
-        prnt("\nУстройство не подключено\n")
-
+    drive("X", " SL -", ui.lineEdit_4.text())
 ui.pushButton_4.clicked.connect( left )
 
 #Движение по оси +y
 def up():
-    try:
-        s.send("\n".encode("utf-8") + "Y SL ".encode("utf-8") + Speed.encode("utf-8") + "\n".encode("utf-8"))
-        otvet = s.recv(1024)
-        prnt ( "\n" + str(otvet) + "\n")
-        prnt("\nДвижение началось\n")
-    except:
-        prnt("\nУстройство не подключено\n")
-
+    drive("Y", " SL ", ui.lineEdit_4.text())
 ui.pushButton_5.clicked.connect( up )
 
 #Движение по оси +x
 def right():
-    try:
-        s.send("\n".encode("utf-8") + "X SL ".encode("utf-8") + Speed.encode("utf-8") + "\n".encode("utf-8"))
-        otvet = s.recv(1024)
-        prnt ( "\n" + str(otvet) + "\n")
-        prnt("\nДвижение началось\n")
-    except:
-        prnt("\nУстройство не подключено\n")
-
+    drive("X", " SL ", ui.lineEdit_4.text())
 ui.pushButton_7.clicked.connect( right )
 
 #Движение по оси -y
 def down():
-    try:
-        s.send("\n".encode("utf-8") + "Y SL -".encode("utf-8") + Speed.encode("utf-8") + "\n".encode("utf-8"))
-        otvet = s.recv(1024)
-        prnt ( "\n" + str(otvet) + "\n")
-        prnt("\nДвижение началось\n")
-    except:
-        prnt("\nУстройство не подключено\n")
-
+    drive("Y", " SL -", ui.lideEdit_4.text())
 ui.pushButton_8.clicked.connect( down )
 
 # Остановка двигателя
 def STOPX():
-    try:
-        s.send(b"\nX SL 0\n")
-        otvet = s.recv(1024)
-        prnt ( "\n" + str(otvet) + "\n")
-        prnt("\nДвижение остановилось\n")
-    except:
-        prnt("\nУстройство не подключено\n")
-
+    drive("X", " SL", ui.lineEdit_4)
 ui.pushButton_6.clicked.connect( STOPX )
 
 # Остановка двигателя
 def STOPY():
-    try:
-        s.send(b"\nY SL 0\n")
-        otvet = s.recv(1024)
-        prnt ( "\n" + str(otvet) + "\n")
-        prnt("\nДвижение остановилось\n")
-    except:
-        prnt("\nУстройство не подключено\n")
-
+    drive("Y", " SL 0", ui.lideEdit_4)
 ui.pushButton_9.clicked.connect( STOPY )
 
-#Отключение от сокета
-def EXIT():
+def exit():
     try:
         s.close()
-        prnt("\nВы отключились от устройства. \n")
     except:
         prnt("\nВы не подключены к устройству\n")
+#Отключение от сокета
+def EXIT():
+    exit(prnt("\nВы отключились от устройства. \n"))
 ui.pushButton_3.clicked.connect( EXIT )
 
 app.exec()
